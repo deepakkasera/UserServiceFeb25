@@ -7,5 +7,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginResponseDto {
-    private Token token;
+    private String tokenValue;
 }

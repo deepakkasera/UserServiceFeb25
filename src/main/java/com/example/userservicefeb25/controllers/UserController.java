@@ -1,7 +1,11 @@
 package com.example.userservicefeb25.controllers;
 
 import com.example.userservicefeb25.dtos.*;
+import com.example.userservicefeb25.models.Token;
+import com.example.userservicefeb25.models.User;
+import com.example.userservicefeb25.repositories.TokenRepository;
 import com.example.userservicefeb25.services.UserService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,12 +20,26 @@ public class UserController {
 
     @PostMapping("/login")
     public LoginResponseDto login(@RequestBody LoginRequestDto requestDto) {
-        return null;
+        Token token = userService.login(
+                requestDto.getEmail(),
+                requestDto.getPassword()
+        );
+
+        LoginResponseDto responseDto = new LoginResponseDto();
+        responseDto.setTokenValue(token.getValue());
+        return responseDto;
     }
 
     @PostMapping("/signup")
     public UserDto signUp(@RequestBody SignUpRequestDto requestDto) {
-        return null;
+        User user = userService.signUp(
+                requestDto.getName(),
+                requestDto.getEmail(),
+                requestDto.getPassword()
+        );
+
+        //Convert User to UserDto
+        return UserDto.from(user);
     }
 
     @GetMapping("/logout")
@@ -31,7 +49,21 @@ public class UserController {
 
     //localhost:8080/users/validate/token
     @GetMapping("/validate/{token}")
-    public UserDto validateToken(@PathVariable("token") String tokenValue) {
-        return null;
+    public ResponseEntity<UserDto> validateToken(@PathVariable("token") String tokenValue) {
+        User user = userService.validateToken(tokenValue);
+        ResponseEntity<UserDto> responseEntity = null;
+        if (user == null) {
+            responseEntity = new ResponseEntity<>(
+                    null,
+                    HttpStatus.UNAUTHORIZED
+            );
+        } else {
+            responseEntity = new ResponseEntity<>(
+                    UserDto.from(user),
+                    HttpStatus.OK
+            );
+        }
+
+        return responseEntity;
     }
 }
