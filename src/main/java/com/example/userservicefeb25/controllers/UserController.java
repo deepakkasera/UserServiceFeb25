@@ -66,4 +66,9 @@ public class UserController {
 
         return responseEntity;
     }
+
+    @GetMapping("/sample")
+    public void sampleAPI() {
+        System.out.println("Got a Sample API request.");
+    }
 }
